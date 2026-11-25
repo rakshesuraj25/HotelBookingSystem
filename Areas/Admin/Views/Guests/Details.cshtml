@@ -1,0 +1,74 @@
+@model AdminGuestDetailsViewModel
+@{
+    ViewData["Title"] = Model.FullName;
+}
+
+<div class="mb-3">
+    <a asp-area="Admin" asp-controller="Guests" asp-action="Index" class="btn btn-hotel-outline btn-sm">&larr; Back to Guests</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="summary-card">
+            <span class="eyebrow d-block mb-1">Guest Account</span>
+            <h2 class="h4 mb-2">@Model.FullName</h2>
+            <p class="small text-muted mb-1">@Model.Email</p>
+            <p class="small text-muted mb-3">@(Model.PhoneNumber ?? "No phone provided")</p>
+            <div class="mb-3">
+                <span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">
+                    @(Model.IsActive ? "Active Account" : "Deactivated")
+                </span>
+            </div>
+            <p class="small text-muted mb-3">Registered: @Model.CreatedAt.ToString("dd MMM yyyy") (UTC)</p>
+            <form asp-area="Admin" asp-controller="Guests" asp-action="ToggleActive" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-sm w-100 @(Model.IsActive ? "btn-outline-danger" : "btn-hotel-primary")">
+                    @(Model.IsActive ? "Deactivate Account" : "Activate Account")
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="summary-card">
+            <h3 class="h5 mb-3">Reservation History (@Model.Bookings.Count)</h3>
+            @if (Model.Bookings.Count == 0)
+            {
+                <p class="text-muted small mb-0">This guest has not made any reservations yet.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table align-middle small mb-0">
+                        <thead>
+                            <tr>
+                                <th>Reference</th>
+                                <th>Room</th>
+                                <th>Dates</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var b in Model.Bookings)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@b.BookingReference</td>
+                                    <td>@b.RoomNumber &ndash; @b.RoomName</td>
+                                    <td>@b.CheckInDate.ToString("dd MMM") &ndash; @b.CheckOutDate.ToString("dd MMM yyyy")</td>
+                                    <td class="fw-semibold">@CurrencyFormatter.FormatInr(b.TotalAmount)</td>
+                                    <td><span class="badge bg-dark">@b.BookingStatus</span></td>
+                                    <td class="text-end">
+                                        <a asp-area="Admin" asp-controller="Bookings" asp-action="Details" asp-route-id="@b.Id"
+                                           class="btn btn-hotel-outline btn-sm">Manage</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

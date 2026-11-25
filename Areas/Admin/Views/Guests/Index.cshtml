@@ -1,0 +1,56 @@
+@model IReadOnlyList<AdminGuestViewModel>
+@{
+    ViewData["Title"] = "Guest Management";
+}
+
+<div class="summary-card">
+    @if (Model.Count == 0)
+    {
+        <p class="text-muted small mb-0">No registered guests yet.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle small mb-0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Bookings</th>
+                        <th>Status</th>
+                        <th>Joined (UTC)</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var guest in Model)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@guest.FullName</td>
+                            <td>@guest.Email</td>
+                            <td>@(guest.PhoneNumber ?? "—")</td>
+                            <td>@guest.BookingCount</td>
+                            <td>
+                                <span class="badge @(guest.IsActive ? "bg-success" : "bg-secondary")">
+                                    @(guest.IsActive ? "Active" : "Inactive")
+                                </span>
+                            </td>
+                            <td>@guest.CreatedAt.ToString("dd MMM yyyy")</td>
+                            <td class="text-end text-nowrap">
+                                <a asp-area="Admin" asp-controller="Guests" asp-action="Details" asp-route-id="@guest.Id"
+                                   class="btn btn-hotel-outline btn-sm">Details</a>
+                                <form asp-area="Admin" asp-controller="Guests" asp-action="ToggleActive" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@guest.Id" />
+                                    <button type="submit" class="btn btn-sm @(guest.IsActive ? "btn-outline-danger" : "btn-outline-success")">
+                                        @(guest.IsActive ? "Deactivate" : "Activate")
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

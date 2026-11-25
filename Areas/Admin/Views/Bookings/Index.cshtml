@@ -1,0 +1,77 @@
+@model AdminBookingListViewModel
+@{
+    ViewData["Title"] = "Booking Management";
+
+    string GetStatusBadgeClass(BookingStatus status) => status switch
+    {
+        BookingStatus.Pending => "bg-warning text-dark",
+        BookingStatus.Confirmed => "bg-success",
+        BookingStatus.Cancelled => "bg-danger",
+        BookingStatus.Completed => "bg-primary",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="summary-card mb-4">
+    <form asp-area="Admin" asp-controller="Bookings" asp-action="Index" method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label asp-for="SearchReference" class="form-label small fw-semibold">Booking Reference</label>
+            <input asp-for="SearchReference" class="form-control" placeholder="e.g. HBS-2026..." />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="StatusFilter" class="form-label small fw-semibold">Status</label>
+            <select asp-for="StatusFilter" asp-items="Html.GetEnumSelectList<BookingStatus>()" class="form-select">
+                <option value="">All Statuses</option>
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-hotel-primary flex-grow-1">Filter</button>
+            <a asp-area="Admin" asp-controller="Bookings" asp-action="Index" class="btn btn-hotel-outline">Reset</a>
+        </div>
+    </form>
+</div>
+
+<div class="summary-card">
+    @if (Model.Bookings.Count == 0)
+    {
+        <p class="text-muted small mb-0">No bookings match the current filter.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle small mb-0">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Guest</th>
+                        <th>Room</th>
+                        <th>Stay Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model.Bookings)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@b.BookingReference</td>
+                            <td>
+                                <div>@b.GuestName</div>
+                                <div class="text-muted">@b.GuestEmail</div>
+                            </td>
+                            <td>@b.RoomNumber &ndash; @b.RoomName</td>
+                            <td>@b.CheckInDate.ToString("dd MMM") &ndash; @b.CheckOutDate.ToString("dd MMM yyyy")</td>
+                            <td class="fw-semibold">@CurrencyFormatter.FormatInr(b.TotalAmount)</td>
+                            <td><span class="badge @GetStatusBadgeClass(b.BookingStatus)">@b.BookingStatus</span></td>
+                            <td class="text-end">
+                                <a asp-area="Admin" asp-controller="Bookings" asp-action="Details" asp-route-id="@b.Id"
+                                   class="btn btn-hotel-outline btn-sm">Details</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

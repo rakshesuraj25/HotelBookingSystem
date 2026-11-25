@@ -1,0 +1,114 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+
+    string GetStatusBadgeClass(BookingStatus status) => status switch
+    {
+        BookingStatus.Pending => "bg-warning text-dark",
+        BookingStatus.Confirmed => "bg-success",
+        BookingStatus.Cancelled => "bg-danger",
+        BookingStatus.Completed => "bg-primary",
+        _ => "bg-secondary"
+    };
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Total Rooms</span>
+            <span class="fs-2 font-display fw-bold">@Model.TotalRooms</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Available Rooms</span>
+            <span class="fs-2 font-display fw-bold">@Model.AvailableRooms</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Total Bookings</span>
+            <span class="fs-2 font-display fw-bold">@Model.TotalBookings</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Pending Bookings</span>
+            <span class="fs-2 font-display fw-bold">@Model.PendingBookings</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Confirmed Bookings</span>
+            <span class="fs-2 font-display fw-bold">@Model.ConfirmedBookings</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Cancelled Bookings</span>
+            <span class="fs-2 font-display fw-bold">@Model.CancelledBookings</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Completed Bookings</span>
+            <span class="fs-2 font-display fw-bold">@Model.CompletedBookings</span>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-xl-3">
+        <div class="admin-kpi h-100">
+            <span class="eyebrow d-block mb-1">Registered Guests</span>
+            <span class="fs-2 font-display fw-bold">@Model.RegisteredGuests</span>
+        </div>
+    </div>
+</div>
+
+<div class="summary-card">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Recent Reservations</h2>
+        <a asp-area="Admin" asp-controller="Bookings" asp-action="Index" class="btn btn-hotel-outline btn-sm">All Bookings</a>
+    </div>
+
+    @if (Model.RecentBookings.Count == 0)
+    {
+        <p class="text-muted small mb-0">No reservations have been created yet.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-hover align-middle small mb-0">
+                <thead>
+                    <tr>
+                        <th>Reference</th>
+                        <th>Guest</th>
+                        <th>Room</th>
+                        <th>Stay Dates</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model.RecentBookings)
+                    {
+                        <tr>
+                            <td class="fw-semibold">@b.BookingReference</td>
+                            <td>
+                                <div>@b.GuestName</div>
+                                <div class="text-muted">@b.GuestEmail</div>
+                            </td>
+                            <td>@b.RoomNumber &ndash; @b.RoomName</td>
+                            <td>@b.CheckInDate.ToString("dd MMM") &ndash; @b.CheckOutDate.ToString("dd MMM yyyy")</td>
+                            <td class="fw-semibold">@CurrencyFormatter.FormatInr(b.TotalAmount)</td>
+                            <td><span class="badge @GetStatusBadgeClass(b.BookingStatus)">@b.BookingStatus</span></td>
+                            <td class="text-end">
+                                <a asp-area="Admin" asp-controller="Bookings" asp-action="Details" asp-route-id="@b.Id"
+                                   class="btn btn-hotel-outline btn-sm">Manage</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

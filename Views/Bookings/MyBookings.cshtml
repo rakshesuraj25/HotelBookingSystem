@@ -1,0 +1,80 @@
+@using HotelBookingSystem.Models.Enums
+@model IReadOnlyList<HotelBookingSystem.Models.Booking>
+@{
+    ViewData["Title"] = "My Bookings";
+}
+
+<section class="container py-5">
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-end mb-4 gap-2">
+        <div>
+            <p class="eyebrow mb-1">Guest Portal</p>
+            <h1 class="display-5 mb-1">My Bookings</h1>
+            <p class="text-muted mb-0">View your upcoming and past reservations at Aarohan Residency.</p>
+        </div>
+        <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-primary btn-sm">Book Another Room</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] is string successMsg)
+    {
+        <div class="alert alert-success alert-dismissible fade show small" role="alert">
+            @successMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] is string errorMsg)
+    {
+        <div class="alert alert-danger alert-dismissible fade show small" role="alert">
+            @errorMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model.Count == 0)
+    {
+        <div class="summary-card text-center py-5 px-4">
+            <h2 class="h4 mb-2">You have no reservations yet</h2>
+            <p class="text-muted mb-4">Explore our available rooms and suites to plan your next stay.</p>
+            <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-primary">Explore Rooms</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var booking in Model)
+            {
+                var canCancel = booking.BookingStatus is BookingStatus.Pending or BookingStatus.Confirmed;
+                <div class="col-md-6">
+                    <article class="summary-card h-100 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="eyebrow d-block">@booking.BookingReference</span>
+                                <h2 class="h4 mb-0">@booking.Room.Name</h2>
+                            </div>
+                            <span class="badge bg-dark">@booking.BookingStatus</span>
+                        </div>
+                        <p class="small text-muted mb-3 flex-grow-1">
+                            @booking.CheckInDate.ToString("MMM dd, yyyy") &ndash; @booking.CheckOutDate.ToString("MMM dd, yyyy")
+                            &middot; @booking.NumberOfNights @(booking.NumberOfNights == 1 ? "night" : "nights")
+                            &middot; @booking.NumberOfGuests @(booking.NumberOfGuests == 1 ? "guest" : "guests")
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center pt-3 border-top gap-2 flex-wrap">
+                            <span class="price-figure fs-4">@CurrencyFormatter.FormatInr(booking.TotalAmount)</span>
+                            <div class="d-flex gap-2">
+                                <a asp-controller="Bookings" asp-action="Details" asp-route-id="@booking.Id"
+                                   class="btn btn-hotel-outline btn-sm">Details</a>
+                                @if (canCancel)
+                                {
+                                    <form asp-controller="Bookings" asp-action="Cancel" method="post" class="d-inline"
+                                          onsubmit="return confirm('Cancel reservation @booking.BookingReference?');">
+                                        <input type="hidden" name="id" value="@booking.Id" />
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Cancel</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</section>

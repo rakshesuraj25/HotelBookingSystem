@@ -1,0 +1,65 @@
+@model IReadOnlyList<Room>
+@{
+    ViewData["Title"] = "Room Management";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <p class="text-muted small mb-0">Manage room inventory, pricing, descriptions, and availability status.</p>
+    <a asp-area="Admin" asp-controller="Rooms" asp-action="Create" class="btn btn-hotel-primary btn-sm">+ Add Room</a>
+</div>
+
+<div class="summary-card">
+    <div class="table-responsive">
+        <table class="table align-middle small mb-0">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Room #</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Rate / Night</th>
+                    <th>Capacity</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var room in Model)
+                {
+                    var imgPath = string.IsNullOrWhiteSpace(room.ImageUrl) ? "/images/room-placeholder.svg" : room.ImageUrl;
+                    <tr>
+                        <td>
+                            <img src="@imgPath" data-fallback="/images/room-placeholder.svg" alt="@room.Name"
+                                 class="rounded border" style="width: 64px; height: 42px; object-fit: cover;" />
+                        </td>
+                        <td class="fw-semibold">@room.RoomNumber</td>
+                        <td>@room.Name</td>
+                        <td>@room.RoomType</td>
+                        <td class="fw-semibold">@CurrencyFormatter.FormatNightlyRate(room.PricePerNight)</td>
+                        <td>@room.Capacity</td>
+                        <td>
+                            <form asp-area="Admin" asp-controller="Rooms" asp-action="ChangeStatus" method="post" class="d-inline-flex gap-1">
+                                <input type="hidden" name="id" value="@room.Id" />
+                                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    @foreach (RoomStatus s in Enum.GetValues(typeof(RoomStatus)))
+                                    {
+                                        <option value="@s" selected="@(room.RoomStatus == s)">@s</option>
+                                    }
+                                </select>
+                            </form>
+                        </td>
+                        <td class="text-end text-nowrap">
+                            <a asp-area="Admin" asp-controller="Rooms" asp-action="Edit" asp-route-id="@room.Id"
+                               class="btn btn-hotel-outline btn-sm">Edit</a>
+                            <form asp-area="Admin" asp-controller="Rooms" asp-action="Delete" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete room @room.RoomNumber? Rooms with booking history cannot be deleted.');">
+                                <input type="hidden" name="id" value="@room.Id" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

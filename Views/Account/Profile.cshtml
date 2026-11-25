@@ -1,0 +1,37 @@
+@model HotelBookingSystem.ViewModels.ProfileViewModel
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<section class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="summary-card p-4 p-md-5">
+                <p class="eyebrow mb-1">Guest Profile</p>
+                <h1 class="display-6 mb-4">@Model.FullName</h1>
+
+                <dl class="row small mb-4">
+                    <dt class="col-sm-4 text-muted mb-2">Email Address</dt>
+                    <dd class="col-sm-8 mb-2">@Model.Email</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Phone Number</dt>
+                    <dd class="col-sm-8 mb-2">@(Model.PhoneNumber ?? "Not provided")</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Account Role</dt>
+                    <dd class="col-sm-8 mb-2">@Model.Role</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Member Since</dt>
+                    <dd class="col-sm-8 mb-2">@Model.CreatedAt.ToString("MMMM dd, yyyy")</dd>
+
+                    <dt class="col-sm-4 text-muted mb-0">Total Reservations</dt>
+                    <dd class="col-sm-8 mb-0 fw-semibold">@Model.TotalBookings</dd>
+                </dl>
+
+                <div class="d-flex flex-wrap gap-2 pt-3 border-top">
+                    <a asp-controller="Bookings" asp-action="MyBookings" class="btn btn-hotel-primary">View My Bookings</a>
+                    <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-outline">Browse Rooms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,8 +1,235 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using HotelBookingSystem.Models.Enums
+@model HotelBookingSystem.ViewModels.HomeIndexViewModel
+@{
+    ViewData["Title"] = "Welcome";
+    var minCheckIn = DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <p class="eyebrow mb-3 text-uppercase" style="color: #D8BC94;">Aarohan Residency</p>
+                <h1 class="mb-4">Comfortable stays. Thoughtful hospitality.</h1>
+                <p class="hero-subtitle mb-4">
+                    Discover comfortable rooms, welcoming hospitality and a simple booking experience.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-primary">Explore Rooms</a>
+                    <a href="#featured-rooms" class="btn btn-outline-light btn-sm px-3 py-2 align-self-center">View Featured Rooms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container mb-5">
+    <div class="search-panel">
+        <form asp-controller="Rooms" asp-action="Index" method="get" class="row g-3 align-items-end">
+            <div class="col-sm-6 col-lg-3">
+                <label asp-for="Search.CheckInDate" class="form-label small fw-semibold text-muted"></label>
+                <input asp-for="Search.CheckInDate" name="CheckInDate" type="date" min="@minCheckIn"
+                       class="form-control" data-date-checkin />
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <label asp-for="Search.CheckOutDate" class="form-label small fw-semibold text-muted"></label>
+                <input asp-for="Search.CheckOutDate" name="CheckOutDate" type="date" min="@minCheckIn"
+                       class="form-control" data-date-checkout />
+            </div>
+            <div class="col-sm-6 col-lg-2">
+                <label asp-for="Search.Guests" class="form-label small fw-semibold text-muted"></label>
+                <select asp-for="Search.Guests" name="Guests" class="form-select">
+                    @for (var i = 1; i <= 6; i++)
+                    {
+                        <option value="@i">@i @(i == 1 ? "Guest" : "Guests")</option>
+                    }
+                </select>
+            </div>
+            <div class="col-sm-6 col-lg-2">
+                <label asp-for="Search.RoomType" class="form-label small fw-semibold text-muted"></label>
+                <select asp-for="Search.RoomType" name="RoomType" asp-items="Html.GetEnumSelectList<RoomType>()" class="form-select">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div class="col-12 col-lg-2 d-grid">
+                <button type="submit" class="btn btn-hotel-primary">Check Availability</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+<section id="featured-rooms" class="container py-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-2">
+        <div>
+            <p class="eyebrow mb-1">Accommodations</p>
+            <h2 class="display-6 mb-0">Featured Rooms &amp; Suites</h2>
+        </div>
+        <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-outline btn-sm">View All Rooms</a>
+    </div>
+
+    @if (Model.FeaturedRooms.Count == 0)
+    {
+        <div class="summary-card text-center py-5">
+            <h3 class="h4 mb-2">Rooms will appear here once the database is initialized</h3>
+            <p class="text-muted mb-0">Apply the EF Core migration and restart the application to load the curated room catalog.</p>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var room in Model.FeaturedRooms)
+            {
+                <div class="col-md-6 col-lg-3">
+                    <article class="hotel-card">
+                        <div class="room-image-wrap">
+                            <img src="@room.ImageUrl" data-fallback="/images/room-placeholder.svg" alt="@room.Name" loading="lazy" />
+                            <span class="room-type-badge">@room.RoomType</span>
+                        </div>
+                        <div class="p-3 p-xl-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                <h3 class="h5 mb-0">@room.Name</h3>
+                                <span class="small text-muted text-nowrap">Room @room.RoomNumber</span>
+                            </div>
+                            <p class="small text-muted mb-2">Up to @room.Capacity guests &middot; @room.BedType</p>
+                            <p class="small text-muted room-card-desc mb-3">@room.ShortDescription</p>
+                            <div class="d-flex justify-content-between align-items-center pt-3 mt-auto border-top">
+                                <div>
+                                    <span class="price-figure">@CurrencyFormatter.FormatNightlyRate(room.PricePerNight)</span>
+                                    <span class="small text-muted">/ night</span>
+                                </div>
+                                <a asp-controller="Rooms" asp-action="Details" asp-route-id="@room.Id"
+                                   class="btn btn-hotel-outline btn-sm">Details</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</section>
+
+<section class="section-sand py-5 my-3">
+    <div class="container py-2">
+        <div class="text-center mb-5">
+            <p class="eyebrow mb-1">The Stay</p>
+            <h2 class="display-6 mb-2">Essential Hotel Amenities</h2>
+            <p class="text-muted mx-auto" style="max-width: 560px;">
+                Every stay at Aarohan Residency includes reliable everyday conveniences for business and family travelers.
+            </p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-tile">
+                    <p class="eyebrow mb-2">01 &middot; Connectivity</p>
+                    <h3 class="h5 mb-2">High-Speed Wi-Fi</h3>
+                    <p class="small text-muted mb-0">Complimentary wireless internet across all guest rooms, lobby lounges, and work desks.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-tile">
+                    <p class="eyebrow mb-2">02 &middot; Dining</p>
+                    <h3 class="h5 mb-2">Fresh Morning Breakfast</h3>
+                    <p class="small text-muted mb-0">Warm Indian and continental breakfast options prepared fresh daily with in-room dining available.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-tile">
+                    <p class="eyebrow mb-2">03 &middot; Comfort</p>
+                    <h3 class="h5 mb-2">Climate-Controlled Rooms</h3>
+                    <p class="small text-muted mb-0">Quiet air-conditioned rooms with crisp linens, blackout curtains, and daily housekeeping.</p>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="feature-tile">
+                    <p class="eyebrow mb-2">04 &middot; Service</p>
+                    <h3 class="h5 mb-2">24-Hour Front Desk</h3>
+                    <p class="small text-muted mb-0">Round-the-clock reception support for smooth check-in, travel assistance, and local guidance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <div class="row g-3">
+                <div class="col-7">
+                    <div class="room-image-wrap rounded shadow-sm">
+                        <img src="/images/hotel/hotel-lobby.jpg" data-fallback="/images/room-placeholder.svg" alt="Aarohan Residency lobby" loading="lazy" />
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="room-image-wrap rounded shadow-sm h-100">
+                        <img src="/images/hotel/hotel-exterior.jpg" data-fallback="/images/room-placeholder.svg" alt="Aarohan Residency exterior" loading="lazy" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <p class="eyebrow mb-2">Why Choose Aarohan Residency</p>
+            <h2 class="display-6 mb-3">Transparent INR pricing and direct booking confidence.</h2>
+            <p class="text-muted mb-4">
+                Reserve directly with Aarohan Residency for real-time room availability, clear INR nightly rates, and flexible cancellation terms without hidden fees.
+            </p>
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6">
+                    <div class="feature-tile">
+                        <h3 class="h6 mb-1">Real-Time Availability</h3>
+                        <p class="small text-muted mb-0">Live date-range checks verify room availability before confirmation.</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="feature-tile">
+                        <h3 class="h6 mb-1">Rate-Lock Guarantee</h3>
+                        <p class="small text-muted mb-0">Your nightly rate is locked at booking time for complete peace of mind.</p>
+                    </div>
+                </div>
+            </div>
+            <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-primary">Browse Available Rooms</a>
+        </div>
+    </div>
+</section>
+
+<section class="section-sand py-5">
+    <div class="container py-2">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-2">
+            <div>
+                <p class="eyebrow mb-1">Guest Impressions</p>
+                <h2 class="display-6 mb-0">Sample Guest Feedback</h2>
+            </div>
+            <span class="small text-muted">Illustrative placeholder reviews</span>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-tile">
+                    <p class="fst-italic mb-3">"Clean, quiet rooms and a smooth check-in experience. Ideal for a peaceful weekend stay."</p>
+                    <p class="small fw-semibold mb-0">Ananya S. &middot; Sample Review</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-tile">
+                    <p class="fst-italic mb-3">"The family room had plenty of space for all of us, and the staff was warm and attentive."</p>
+                    <p class="small fw-semibold mb-0">Rohan &amp; Meera V. &middot; Sample Review</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-tile">
+                    <p class="fst-italic mb-3">"Reliable Wi-Fi, comfortable workspace, and transparent pricing. Great value for business travel."</p>
+                    <p class="small fw-semibold mb-0">Vikram P. &middot; Sample Review</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container py-5 text-center">
+    <div class="summary-card py-5 px-4">
+        <p class="eyebrow mb-2">Plan Your Stay</p>
+        <h2 class="display-6 mb-3">Ready to book your stay at Aarohan Residency?</h2>
+        <p class="text-muted mx-auto mb-4" style="max-width: 540px;">
+            Compare our Standard, Deluxe, Suite, and Family rooms and reserve your preferred dates in minutes.
+        </p>
+        <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-primary">Find Your Room</a>
+    </div>
+</section>

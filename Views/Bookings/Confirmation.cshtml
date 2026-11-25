@@ -1,0 +1,67 @@
+@model HotelBookingSystem.ViewModels.BookingConfirmationViewModel
+@{
+    ViewData["Title"] = "Reservation Confirmed";
+}
+
+<section class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="summary-card p-4 p-md-5">
+                <p class="eyebrow mb-2">Reservation Received</p>
+                <h1 class="display-5 mb-2">Thank you for your booking</h1>
+                <p class="text-muted mb-4">
+                    Your reservation has been recorded. Please keep your booking reference for check-in.
+                </p>
+
+                <div class="feature-tile mb-4">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-sm-3">
+                            <div class="room-image-wrap rounded">
+                                <img src="@Model.ImageUrl" data-fallback="/images/room-placeholder.svg" alt="@Model.RoomName" />
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <span class="small text-muted d-block">Booking Reference</span>
+                            <strong class="fs-4 font-display">@Model.BookingReference</strong>
+                        </div>
+                        <div class="col-sm-4 text-sm-end">
+                            <span class="small text-muted d-block">Status</span>
+                            <span class="badge bg-dark px-3 py-2">@Model.BookingStatus</span>
+                        </div>
+                    </div>
+                </div>
+
+                <dl class="row small mb-4">
+                    <dt class="col-sm-4 text-muted mb-2">Room</dt>
+                    <dd class="col-sm-8 mb-2 fw-semibold">@Model.RoomName (@Model.RoomType &middot; Room @Model.RoomNumber)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Check-in</dt>
+                    <dd class="col-sm-8 mb-2">@Model.CheckInDate.ToString("dddd, MMM dd, yyyy") (from 3:00 PM)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Check-out</dt>
+                    <dd class="col-sm-8 mb-2">@Model.CheckOutDate.ToString("dddd, MMM dd, yyyy") (until 11:00 AM)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Guests &amp; Nights</dt>
+                    <dd class="col-sm-8 mb-2">@Model.NumberOfGuests @(Model.NumberOfGuests == 1 ? "Guest" : "Guests") &middot; @Model.NumberOfNights @(Model.NumberOfNights == 1 ? "Night" : "Nights")</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Locked Nightly Rate</dt>
+                    <dd class="col-sm-8 mb-2">@CurrencyFormatter.FormatNightlyRate(Model.PricePerNight)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Total Amount</dt>
+                    <dd class="col-sm-8 mb-2 fw-semibold fs-5">@CurrencyFormatter.FormatInr(Model.TotalAmount)</dd>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.SpecialRequests))
+                    {
+                        <dt class="col-sm-4 text-muted mb-2">Special Requests</dt>
+                        <dd class="col-sm-8 mb-2">@Model.SpecialRequests</dd>
+                    }
+                </dl>
+
+                <div class="d-flex flex-wrap gap-3 pt-3 border-top">
+                    <a asp-controller="Bookings" asp-action="MyBookings" class="btn btn-hotel-primary">View My Bookings</a>
+                    <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-outline">Browse More Rooms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

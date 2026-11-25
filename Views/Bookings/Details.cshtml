@@ -1,0 +1,70 @@
+@using HotelBookingSystem.Models.Enums
+@model HotelBookingSystem.ViewModels.BookingConfirmationViewModel
+@{
+    ViewData["Title"] = $"Booking {Model.BookingReference}";
+    var canCancel = Model.BookingStatus is BookingStatus.Pending or BookingStatus.Confirmed;
+}
+
+<section class="container py-5">
+    <div class="mb-3">
+        <a asp-controller="Bookings" asp-action="MyBookings" class="btn btn-hotel-outline btn-sm">&larr; Back to My Bookings</a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="summary-card p-4 p-md-5">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4">
+                    <div>
+                        <p class="eyebrow mb-1">Reservation Details</p>
+                        <h1 class="display-6 mb-0">@Model.BookingReference</h1>
+                    </div>
+                    <span class="badge bg-dark fs-6 px-3 py-2">@Model.BookingStatus</span>
+                </div>
+
+                <div class="room-image-wrap rounded mb-4" style="max-height: 260px;">
+                    <img src="@Model.ImageUrl" data-fallback="/images/room-placeholder.svg" alt="@Model.RoomName" />
+                </div>
+
+                <dl class="row small mb-4">
+                    <dt class="col-sm-4 text-muted mb-2">Room</dt>
+                    <dd class="col-sm-8 mb-2 fw-semibold">@Model.RoomName (@Model.RoomType &middot; Room @Model.RoomNumber)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Check-in</dt>
+                    <dd class="col-sm-8 mb-2">@Model.CheckInDate.ToString("dddd, MMM dd, yyyy") (from 3:00 PM)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Check-out</dt>
+                    <dd class="col-sm-8 mb-2">@Model.CheckOutDate.ToString("dddd, MMM dd, yyyy") (until 11:00 AM)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Guests &amp; Nights</dt>
+                    <dd class="col-sm-8 mb-2">@Model.NumberOfGuests @(Model.NumberOfGuests == 1 ? "Guest" : "Guests") &middot; @Model.NumberOfNights @(Model.NumberOfNights == 1 ? "Night" : "Nights")</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Nightly Rate Snapshot</dt>
+                    <dd class="col-sm-8 mb-2">@CurrencyFormatter.FormatNightlyRate(Model.PricePerNight)</dd>
+
+                    <dt class="col-sm-4 text-muted mb-2">Total Amount</dt>
+                    <dd class="col-sm-8 mb-2 fw-semibold fs-5">@CurrencyFormatter.FormatInr(Model.TotalAmount)</dd>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.SpecialRequests))
+                    {
+                        <dt class="col-sm-4 text-muted mb-2">Special Requests</dt>
+                        <dd class="col-sm-8 mb-2">@Model.SpecialRequests</dd>
+                    }
+
+                    <dt class="col-sm-4 text-muted mb-0">Booked On (UTC)</dt>
+                    <dd class="col-sm-8 mb-0">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+                </dl>
+
+                @if (canCancel)
+                {
+                    <div class="pt-3 border-top">
+                        <form asp-controller="Bookings" asp-action="Cancel" method="post"
+                              onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                            <input type="hidden" name="id" value="@Model.BookingId" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm">Cancel Reservation</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>

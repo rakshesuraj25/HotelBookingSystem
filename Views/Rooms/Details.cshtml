@@ -1,0 +1,91 @@
+@model HotelBookingSystem.ViewModels.RoomDetailsViewModel
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<section class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Rooms" asp-action="Index" class="text-decoration-none text-muted">Rooms</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <div class="room-detail-hero mb-4">
+                <img src="@Model.ImageUrl" data-fallback="/images/room-placeholder.svg" alt="@Model.Name" />
+            </div>
+
+            <div class="mb-4">
+                <p class="eyebrow mb-1">@Model.RoomType &middot; Room @Model.RoomNumber</p>
+                <h1 class="display-5 mb-3">@Model.Name</h1>
+                <p class="text-muted fs-6">@Model.Description</p>
+            </div>
+
+            @if (Model.Amenities.Count > 0)
+            {
+                <div class="mb-4">
+                    <h2 class="h4 mb-3">Room Amenities</h2>
+                    <div class="d-flex flex-wrap gap-2">
+                        @foreach (var amenity in Model.Amenities)
+                        {
+                            <span class="amenity-chip px-3 py-1">@amenity</span>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="feature-tile">
+                <h2 class="h5 mb-3">Check-in &amp; Stay Information</h2>
+                <div class="row g-3 small text-muted">
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Check-in Time</strong>
+                        From 3:00 PM (24-hour front desk)
+                    </div>
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Check-out Time</strong>
+                        Until 11:00 AM
+                    </div>
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Maximum Occupancy</strong>
+                        @Model.Capacity @(Model.Capacity == 1 ? "Guest" : "Guests")
+                    </div>
+                    <div class="col-sm-6">
+                        <strong class="text-dark d-block">Bedding Configuration</strong>
+                        @Model.BedType
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="summary-card sticky-lg-top" style="top: 6rem;">
+                <p class="eyebrow mb-1">Direct Reservation</p>
+                <div class="d-flex align-items-baseline gap-2 mb-3 pb-3 border-bottom">
+                    <span class="price-figure fs-2">@CurrencyFormatter.FormatNightlyRate(Model.PricePerNight)</span>
+                    <span class="text-muted small">per night</span>
+                </div>
+
+                <ul class="list-unstyled small d-grid gap-2 mb-4 text-muted">
+                    <li><strong class="text-dark">Category:</strong> @Model.RoomType</li>
+                    <li><strong class="text-dark">Capacity:</strong> Up to @Model.Capacity guests</li>
+                    <li><strong class="text-dark">Bed Type:</strong> @Model.BedType</li>
+                    <li><strong class="text-dark">Cancellation:</strong> Free up to 24h before check-in</li>
+                </ul>
+
+                <div class="d-grid gap-2">
+                    <a asp-controller="Bookings"
+                       asp-action="Create"
+                       asp-route-roomId="@Model.Id"
+                       asp-route-checkInDate="@(Model.CheckInDate?.ToString("yyyy-MM-dd"))"
+                       asp-route-checkOutDate="@(Model.CheckOutDate?.ToString("yyyy-MM-dd"))"
+                       asp-route-guests="@Model.Guests"
+                       class="btn btn-hotel-primary">Book Now</a>
+                    <a asp-controller="Rooms" asp-action="Index" class="btn btn-hotel-outline">Back to All Rooms</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,83 @@
+@{
+    var activeController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Aarohan Residency Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar p-3 p-lg-4">
+            <div class="d-flex justify-content-between align-items-center mb-lg-4">
+                <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="text-decoration-none text-white d-flex align-items-center gap-2">
+                    <span class="hotel-brand-mark" aria-hidden="true">A</span>
+                    <span>
+                        <span class="eyebrow d-block" style="color: #D8BC94;">Management</span>
+                        <span class="font-display fs-4">Aarohan Residency</span>
+                    </span>
+                </a>
+                <button class="btn btn-sm btn-outline-light d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#adminSidebarNav">
+                    Menu
+                </button>
+            </div>
+
+            <nav id="adminSidebarNav" class="collapse d-lg-flex flex-column gap-1 mt-3 mt-lg-0 flex-grow-1" aria-label="Admin navigation">
+                <a class="admin-nav-link @(activeController == "Dashboard" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                <a class="admin-nav-link @(activeController == "Rooms" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Rooms" asp-action="Index">Rooms</a>
+                <a class="admin-nav-link @(activeController == "Bookings" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Bookings" asp-action="Index">Bookings</a>
+                <a class="admin-nav-link @(activeController == "Guests" ? "active" : "")"
+                   asp-area="Admin" asp-controller="Guests" asp-action="Index">Guests</a>
+
+                <hr class="border-secondary opacity-25 my-3" />
+
+                <a class="admin-nav-link" asp-area="" asp-controller="Home" asp-action="Index">View Guest Website</a>
+                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="mt-2">
+                    <button type="submit" class="btn btn-sm btn-outline-light w-100">Sign Out</button>
+                </form>
+            </nav>
+        </aside>
+
+        <div class="flex-grow-1 d-flex flex-column min-w-0">
+            <header class="admin-topbar px-4 py-3 d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">@ViewData["Title"]</h1>
+                <span class="small text-muted">Signed in as <strong>@User.Identity?.Name</strong> (Admin)</span>
+            </header>
+
+            <main class="p-4 flex-grow-1">
+                @if (TempData["SuccessMessage"] is string successMsg)
+                {
+                    <div class="alert alert-success alert-dismissible fade show small" role="alert">
+                        @successMsg
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["ErrorMessage"] is string errorMsg)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show small" role="alert">
+                        @errorMsg
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

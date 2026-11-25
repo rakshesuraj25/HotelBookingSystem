@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Aurelia Grand Hotel exterior and lobby ambiance">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2B2623" />
+      <stop offset="60%" stop-color="#3E352F" />
+      <stop offset="100%" stop-color="#56493E" />
+    </linearGradient>
+    <linearGradient id="warmGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#C8A97E" stop-opacity="0.35" />
+      <stop offset="100%" stop-color="#9A7B4F" stop-opacity="0.05" />
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)" />
+  <circle cx="1220" cy="240" r="320" fill="url(#warmGlow)" />
+  <rect x="0" y="640" width="1600" height="260" fill="#1F1B18" />
+  <rect x="260" y="210" width="1080" height="430" fill="#29231F" stroke="#9A7B4F" stroke-opacity="0.35" stroke-width="2" />
+  <rect x="640" y="450" width="320" height="190" fill="#3B3128" stroke="#C8A97E" stroke-opacity="0.55" stroke-width="2" />
+  <g fill="#D8BC94" fill-opacity="0.22">
+    <rect x="320" y="260" width="90" height="130" rx="2" />
+    <rect x="450" y="260" width="90" height="130" rx="2" />
+    <rect x="580" y="260" width="90" height="130" rx="2" />
+    <rect x="930" y="260" width="90" height="130" rx="2" />
+    <rect x="1060" y="260" width="90" height="130" rx="2" />
+    <rect x="1190" y="260" width="90" height="130" rx="2" />
+    <rect x="320" y="450" width="90" height="130" rx="2" />
+    <rect x="450" y="450" width="90" height="130" rx="2" />
+    <rect x="1060" y="450" width="90" height="130" rx="2" />
+    <rect x="1190" y="450" width="90" height="130" rx="2" />
+  </g>
+  <line x1="220" y1="640" x2="1380" y2="640" stroke="#9A7B4F" stroke-opacity="0.45" stroke-width="2" />
+</svg>

@@ -1,0 +1,75 @@
+@model AdminBookingDetailsViewModel
+@{
+    ViewData["Title"] = $"Booking {Model.BookingReference}";
+}
+
+<div class="mb-3">
+    <a asp-area="Admin" asp-controller="Bookings" asp-action="Index" class="btn btn-hotel-outline btn-sm">&larr; Back to Bookings</a>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="summary-card">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="eyebrow d-block">Reservation</span>
+                    <h2 class="h3 mb-0">@Model.BookingReference</h2>
+                </div>
+                <span class="badge bg-dark fs-6 px-3 py-2">@Model.BookingStatus</span>
+            </div>
+
+            <dl class="row small mb-0">
+                <dt class="col-sm-4 text-muted mb-2">Room</dt>
+                <dd class="col-sm-8 mb-2 fw-semibold">@Model.RoomNumber &ndash; @Model.RoomName (@Model.RoomType)</dd>
+
+                <dt class="col-sm-4 text-muted mb-2">Check-in</dt>
+                <dd class="col-sm-8 mb-2">@Model.CheckInDate.ToString("dddd, MMM dd, yyyy")</dd>
+
+                <dt class="col-sm-4 text-muted mb-2">Check-out</dt>
+                <dd class="col-sm-8 mb-2">@Model.CheckOutDate.ToString("dddd, MMM dd, yyyy")</dd>
+
+                <dt class="col-sm-4 text-muted mb-2">Guests / Nights</dt>
+                <dd class="col-sm-8 mb-2">@Model.NumberOfGuests guest(s) &middot; @Model.NumberOfNights night(s)</dd>
+
+                <dt class="col-sm-4 text-muted mb-2">Nightly Rate Snapshot</dt>
+                <dd class="col-sm-8 mb-2">@CurrencyFormatter.FormatNightlyRate(Model.PricePerNight)</dd>
+
+                <dt class="col-sm-4 text-muted mb-2">Total Amount</dt>
+                <dd class="col-sm-8 mb-2 fw-bold fs-5">@CurrencyFormatter.FormatInr(Model.TotalAmount)</dd>
+
+                <dt class="col-sm-4 text-muted mb-2">Special Requests</dt>
+                <dd class="col-sm-8 mb-2">@(string.IsNullOrWhiteSpace(Model.SpecialRequests) ? "None" : Model.SpecialRequests)</dd>
+
+                <dt class="col-sm-4 text-muted mb-0">Created (UTC)</dt>
+                <dd class="col-sm-8 mb-0">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+            </dl>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="summary-card mb-4">
+            <h3 class="h5 mb-3">Guest Information</h3>
+            <p class="small mb-1"><strong>@Model.GuestName</strong></p>
+            <p class="small text-muted mb-1">@Model.GuestEmail</p>
+            <p class="small text-muted mb-3">@(Model.GuestPhone ?? "No phone provided")</p>
+            <a asp-area="Admin" asp-controller="Guests" asp-action="Details" asp-route-id="@Model.GuestId"
+               class="btn btn-hotel-outline btn-sm">View Guest Profile</a>
+        </div>
+
+        <div class="summary-card">
+            <h3 class="h5 mb-3">Update Status</h3>
+            <form asp-area="Admin" asp-controller="Bookings" asp-action="UpdateStatus" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="mb-3">
+                    <select name="newStatus" class="form-select">
+                        @foreach (BookingStatus s in Enum.GetValues(typeof(BookingStatus)))
+                        {
+                            <option value="@s" selected="@(Model.BookingStatus == s)">@s</option>
+                        }
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-hotel-primary w-100">Save Status</button>
+            </form>
+        </div>
+    </div>
+</div>

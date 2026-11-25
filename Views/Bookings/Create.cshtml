@@ -1,0 +1,120 @@
+@model HotelBookingSystem.ViewModels.BookingCreateViewModel
+@{
+    ViewData["Title"] = "Complete Reservation";
+    var minCheckIn = DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
+}
+
+<section class="container py-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index" class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Rooms" asp-action="Index" class="text-decoration-none text-muted">Rooms</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Rooms" asp-action="Details" asp-route-id="@Model.RoomId" class="text-decoration-none text-muted">@Model.RoomName</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Reserve</li>
+        </ol>
+    </nav>
+
+    <div class="mb-4">
+        <p class="eyebrow mb-1">Reservation</p>
+        <h1 class="display-5 mb-2">Reserve Your Stay</h1>
+        <p class="text-muted mb-0">Review your stay details below. Final pricing is always verified on the server.</p>
+    </div>
+
+    @if (Model.RequiresAuthenticationNotice)
+    {
+        <div class="alert alert-warning border-0 shadow-sm mb-4" role="alert">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                    <strong class="d-block">Sign-in required to confirm booking</strong>
+                    <span class="small">
+                        Guest authentication will be enabled in the next phase. You can review dates and estimated totals here, and sign in or register once accounts are active to submit your reservation.
+                    </span>
+                </div>
+                <button type="button" class="btn btn-hotel-outline btn-sm text-nowrap" data-bs-toggle="modal" data-bs-target="#authPendingModal">
+                    Sign In / Register
+                </button>
+            </div>
+        </div>
+    }
+
+    <div class="row g-5">
+        <div class="col-lg-7">
+            <div class="summary-card">
+                <form asp-controller="Bookings" asp-action="Create" method="post" novalidate>
+                    <input type="hidden" asp-for="RoomId" />
+
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger small mb-4"></div>
+                    }
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="CheckInDate" class="form-label small fw-semibold"></label>
+                            <input asp-for="CheckInDate" type="date" min="@minCheckIn" class="form-control" data-date-checkin />
+                            <span asp-validation-for="CheckInDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="CheckOutDate" class="form-label small fw-semibold"></label>
+                            <input asp-for="CheckOutDate" type="date" min="@minCheckIn" class="form-control" data-date-checkout />
+                            <span asp-validation-for="CheckOutDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="NumberOfGuests" class="form-label small fw-semibold"></label>
+                            <select asp-for="NumberOfGuests" class="form-select">
+                                @for (var i = 1; i <= Model.RoomCapacity; i++)
+                                {
+                                    <option value="@i">@i @(i == 1 ? "Guest" : "Guests")</option>
+                                }
+                            </select>
+                            <span asp-validation-for="NumberOfGuests" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="SpecialRequests" class="form-label small fw-semibold"></label>
+                            <textarea asp-for="SpecialRequests" rows="4" class="form-control"
+                                      placeholder="Optional: early check-in request, quiet floor preference, crib, or dietary notes"></textarea>
+                            <span asp-validation-for="SpecialRequests" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-3 mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-hotel-primary">Confirm Reservation</button>
+                        <a asp-controller="Rooms" asp-action="Details" asp-route-id="@Model.RoomId" class="btn btn-hotel-outline">Back to Room</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <aside class="summary-card" data-booking-summary data-nightly-rate="@Model.PricePerNight.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+                <div class="room-image-wrap rounded mb-3">
+                    <img src="@Model.ImageUrl" data-fallback="/images/room-placeholder.svg" alt="@Model.RoomName" />
+                </div>
+                <p class="eyebrow mb-1">@Model.RoomType &middot; Room @Model.RoomNumber</p>
+                <h2 class="h4 mb-1">@Model.RoomName</h2>
+                <p class="small text-muted mb-3">Up to @Model.RoomCapacity guests &middot; @Model.BedType</p>
+
+                <hr class="my-3" />
+
+                <dl class="row small mb-0">
+                    <dt class="col-6 text-muted fw-normal mb-2">Nightly Rate</dt>
+                    <dd class="col-6 text-end fw-semibold mb-2">@CurrencyFormatter.FormatNightlyRate(Model.PricePerNight)</dd>
+
+                    <dt class="col-6 text-muted fw-normal mb-2">Length of Stay</dt>
+                    <dd class="col-6 text-end fw-semibold mb-2" data-summary-nights>
+                        @(Model.CalculatedNights > 0 ? $"{Model.CalculatedNights} night{(Model.CalculatedNights == 1 ? "" : "s")}" : "—")
+                    </dd>
+
+                    <dt class="col-6 pt-2 border-top fw-semibold fs-6">Estimated Total</dt>
+                    <dd class="col-6 pt-2 border-top text-end price-figure fs-4" data-summary-total>
+                        @(Model.CalculatedNights > 0 ? CurrencyFormatter.FormatInr(Model.EstimatedTotal) : "—")
+                    </dd>
+                </dl>
+            </aside>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
